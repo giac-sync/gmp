@@ -1,0 +1,42 @@
+name: Checkout-Mercurial
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+jobs:
+  checkout-SVN:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+          token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Remove old previous version
+      #   run: rm -rf .npmignore .git && rm -rf *
+      # - name: Add universe repo
+      #   run: sudo add-apt-repository universe
+      - name: Install mercurial
+        run: sudo apt-get install mercurial
+      - name: Install git-remote-hg
+        run: |
+          mkdir ~/bin
+          wget https://raw.github.com/felipec/git-remote-hg/master/git-remote-hg -O ~/bin/git-remote-hg
+          chmod +x ~/bin/git-remote-hg
+      - name: Config git
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+      - name: Checkout & Fetch Mercurial
+        run: |
+          export PATH="$HOME/bin:$PATH"
+          git remote add mercurial "https://gmplib.org/repo/gmp-6.2/"
+          git fetch mercurial
+          git pull mercurial
+      - name: Pull repo # in case of someone updated repo during svn fetch ...
+        run: git pull
+      - name: Push new changes
+        run: |
+          git push origin --all
+          git push origin --tags
