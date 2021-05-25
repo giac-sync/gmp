@@ -31,7 +31,7 @@ jobs:
       - name: Checkout & Fetch Mercurial
         run: |
           export PATH="$HOME/bin:$PATH"
-          git remote add mercurial "https://gmplib.org/repo/gmp-6.2/"
+          git remote add mercurial "hg::https://gmplib.org/repo/gmp-6.2/"
           git fetch mercurial
           git pull mercurial
           git gc --aggressive
